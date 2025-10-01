@@ -1,4 +1,12 @@
-<!-- app.js -->
+const express = require("express");
+const path = require("path");
+
+const app = express();
+app.use(express.json());
+
+// Serve the UI
+app.get("/", (req, res) => {
+  res.send(`
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -116,3 +124,13 @@ paypal.Buttons({
 </script>
 </body>
 </html>
+  `);
+});
+
+// Run locally
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => console.log("Server running on http://localhost:" + PORT));
+}
+
+module.exports = app; // needed for Vercel
