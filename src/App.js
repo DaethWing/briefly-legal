@@ -5,8 +5,8 @@ const PAYPAL_CLIENT_ID = "AWvh-pVfzIMo3m0Ytldu84rILL-zeqqTvJZIsVJxERE5yD_bTh71I3
 const PAYPAL_PRO_PLAN_ID = "P-6RK10973X0630022SNDOG65A";
 const PAYPAL_TEAM_PLAN_ID = "P-2XM652161B094711GNDOHBBY";
 
-// ✅ Your live Google Script endpoint
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbziMpbvbtR4XAatEhWvQ207BwIOnrAS0Mm7W_3-aBI9Zb8kuKO1w3JvetWAfJDhJmk5wQ/exec";
+// ✅ Your live working Google Script URL
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyXY6m7cRGb9sMKJPUxW9R1-09fWfXX-iLpWredA7j1jsabQcLtIDmexMbjfuF8qm36/exec";
 
 function loadPayPalScript(clientId) {
   return new Promise((resolve, reject) => {
@@ -30,6 +30,7 @@ export default function App() {
   const [template, setTemplate] = useState("Letter of Complaint");
   const [openFAQ, setOpenFAQ] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalSuccess, setModalSuccess] = useState(false);
 
   // Smooth scrolling
   const scrollToSection = (id) => {
@@ -71,10 +72,9 @@ export default function App() {
       });
       const data = await res.json();
       if (data.status === "Success") {
-        alert("Signup successful — welcome!");
         setForm({ name: "", email: "" });
         setSignedUp(true);
-        setModalOpen(false); // close modal after signup
+        setModalSuccess(true); // show success state
       } else {
         alert("Error: " + data.message);
       }
@@ -86,10 +86,6 @@ export default function App() {
   }
 
   function handleGenerateDoc() {
-    if (!signedUp) {
-      setModalOpen(true);
-      return;
-    }
     let starterText = "";
     if (template === "Letter of Complaint") {
       starterText = "To whom it may concern,\n\nI am writing to formally raise a complaint regarding...";
@@ -127,144 +123,60 @@ export default function App() {
         <button onClick={handleGenerateDoc} style={{ marginTop: "20px", padding: "14px 28px", background: "darkred", color: "white", border: "none", borderRadius: "8px", fontSize: "1rem", cursor: "pointer" }}>
           Try It Free
         </button>
-        <p style={{ fontSize: "0.9rem", marginTop: "10px", color: "#444" }}>No credit card required</p>
+        <p style={{ fontSize: "0.9rem", marginTop: "10px", color: "#444" }}>Try the editor now — signup only required to save/export</p>
       </section>
 
-      {/* Trust Logos */}
-      <section style={{ padding: "40px 20px", textAlign: "center", background: "#fff" }}>
-        <p style={{ fontSize: "1rem", color: "#666" }}>Trusted by entrepreneurs, freelancers, and small businesses worldwide</p>
-        <div style={{ display: "flex", justifyContent: "center", gap: "40px", flexWrap: "wrap", marginTop: "20px" }}>
-          <span style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#999" }}>Forbes</span>
-          <span style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#999" }}>Inc.</span>
-          <span style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#999" }}>TechCrunch</span>
-          <span style={{ fontSize: "1.2rem", fontWeight: "bold", color: "#999" }}>Fast Company</span>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section id="features" style={{ background: "#fff0f0", padding: "60px 20px" }}>
-        <h2 style={{ textAlign: "center", color: "darkred", fontSize: "2rem" }}>Features & Benefits</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px,1fr))", gap: "30px", marginTop: "40px" }}>
-          <div><strong>✔ Customizable Templates</strong><p>Edit before finalizing.</p></div>
-          <div><strong>✔ Export & Print</strong><p>Copy or download instantly.</p></div>
-          <div><strong>✔ Save Profiles</strong><p>Reuse sender/recipient data.</p></div>
-          <div><strong>✔ Instant Preview</strong><p>Real-time formatting as you type.</p></div>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section id="pricing" style={{ padding: "60px 20px" }}>
-        <h2 style={{ textAlign: "center", color: "darkred", fontSize: "2rem" }}>Pricing</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px,1fr))", gap: "30px", marginTop: "40px" }}>
-          {/* Starter */}
-          <div style={{ border: "1px solid #ddd", borderRadius: "12px", padding: "28px", background: "#fff" }}>
-            <h3>Starter (Free)</h3>
-            <p>3 docs / month · Basic templates</p>
-            <button onClick={() => setModalOpen(true)} style={{ marginTop: "12px", padding: "10px", background: "darkred", color: "white", border: "none", borderRadius: "6px", cursor: "pointer" }}>
-              Join Free
-            </button>
-          </div>
-
-          {/* Pro */}
-          <div style={{ border: "1px solid #ddd", borderRadius: "12px", padding: "28px", background: "#fff" }}>
-            <h3>Pro ($9 / mo)</h3>
-            <p>Unlimited docs · Full library · Saved profiles</p>
-            <div ref={proRef} style={{ marginTop: "12px" }}></div>
-          </div>
-
-          {/* Team */}
-          <div style={{ border: "1px solid #ddd", borderRadius: "12px", padding: "28px", background: "#fff" }}>
-            <h3>Team ($19 / mo)</h3>
-            <p>3 users · Shared library · Priority support</p>
-            <div ref={teamRef} style={{ marginTop: "12px" }}></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section style={{ padding: "60px 20px", background: "#fff" }}>
-        <h2 style={{ textAlign: "center", color: "darkred", fontSize: "2rem" }}>What Our Users Say</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px,1fr))", gap: "30px", marginTop: "40px", maxWidth: "900px", marginLeft: "auto", marginRight: "auto" }}>
-          <div style={{ border: "1px solid #eee", borderRadius: "10px", padding: "20px", background: "#fafafa" }}>
-            <p>"Briefly Legal saved me hours when I needed an NDA fast. Super easy to use!"</p>
-            <strong>- Alex M., Startup Founder</strong>
-          </div>
-          <div style={{ border: "1px solid #eee", borderRadius: "10px", padding: "20px", background: "#fafafa" }}>
-            <p>"I love the templates. Professional, clear, and I didn’t need to hire a lawyer."</p>
-            <strong>- Jamie L., Freelancer</strong>
-          </div>
-          <div style={{ border: "1px solid #eee", borderRadius: "10px", padding: "20px", background: "#fafafa" }}>
-            <p>"Our small business runs smoother thanks to Briefly Legal. Highly recommended."</p>
-            <strong>- Priya R., Business Owner</strong>
-          </div>
-        </div>
-      </section>
-
-      {/* Document Editor */}
-      {signedUp && (
-        <section style={{ padding: "60px 20px", background: "#fdfdfd" }}>
-          <h2 style={{ textAlign: "center", color: "darkred" }}>Document Editor</h2>
-          <p style={{ textAlign: "center" }}>Select a template, edit live, then copy or download.</p>
-          <div style={{ marginTop: "30px", maxWidth: "800px", marginLeft: "auto", marginRight: "auto" }}>
-            <label>
-              Template:
-              <select value={template} onChange={(e) => setTemplate(e.target.value)} style={{ marginLeft: "10px" }}>
-                <option>Letter of Complaint</option>
-                <option>Employment Contract</option>
-                <option>NDA</option>
-              </select>
-            </label>
-            <button onClick={handleGenerateDoc} style={{ marginLeft: "15px", padding: "8px 16px" }}>Load</button>
-            <textarea value={docText} onChange={(e) => setDocText(e.target.value)} style={{ width: "100%", height: "300px", marginTop: "20px", padding: "12px", border: "1px solid #ccc", borderRadius: "6px" }} />
+      {/* Document Editor (open to all, but gated features) */}
+      <section style={{ padding: "60px 20px", background: "#fdfdfd" }}>
+        <h2 style={{ textAlign: "center", color: "darkred" }}>Document Editor</h2>
+        <p style={{ textAlign: "center" }}>Select a template, try editing it live. Signup required to copy/export.</p>
+        <div style={{ marginTop: "30px", maxWidth: "800px", marginLeft: "auto", marginRight: "auto" }}>
+          <label>
+            Template:
+            <select value={template} onChange={(e) => setTemplate(e.target.value)} style={{ marginLeft: "10px" }}>
+              <option>Letter of Complaint</option>
+              <option>Employment Contract</option>
+              <option>NDA</option>
+            </select>
+          </label>
+          <button onClick={handleGenerateDoc} style={{ marginLeft: "15px", padding: "8px 16px" }}>Load</button>
+          <textarea value={docText} onChange={(e) => setDocText(e.target.value)} style={{ width: "100%", height: "300px", marginTop: "20px", padding: "12px", border: "1px solid #ccc", borderRadius: "6px" }} />
+          {signedUp ? (
             <button onClick={() => navigator.clipboard.writeText(docText)} style={{ marginTop: "12px", padding: "10px 20px", background: "darkred", color: "white", border: "none", borderRadius: "6px" }}>
               Copy to Clipboard
             </button>
-          </div>
-        </section>
-      )}
-
-      {/* FAQ */}
-      <section id="faq" style={{ padding: "60px 20px", background: "#fff0f0" }}>
-        <h2 style={{ textAlign: "center", color: "darkred", fontSize: "2rem" }}>Frequently Asked Questions</h2>
-        <div style={{ maxWidth: "700px", margin: "40px auto" }}>
-          {[
-            { q: "Is this legal advice?", a: "No. Briefly Legal provides ready-made templates but does not replace professional legal advice." },
-            { q: "Do I need a credit card for the free plan?", a: "No. The Starter plan is 100% free — no credit card required." },
-            { q: "Can I cancel anytime?", a: "Yes, Pro and Team subscriptions can be canceled anytime in your PayPal account." },
-            { q: "What formats are supported?", a: "Currently you can copy text directly or print. Future updates will add Word/PDF export." },
-          ].map((item, idx) => (
-            <div key={idx} style={{ marginBottom: "20px" }}>
-              <button onClick={() => setOpenFAQ(openFAQ === idx ? null : idx)} style={{ width: "100%", textAlign: "left", padding: "12px", border: "1px solid #ccc", borderRadius: "6px", background: "white", cursor: "pointer" }}>
-                {item.q}
-              </button>
-              {openFAQ === idx && (
-                <div style={{ padding: "12px", background: "#fff", border: "1px solid #eee", borderTop: "none" }}>
-                  {item.a}
-                </div>
-              )}
-            </div>
-          ))}
+          ) : (
+            <button onClick={() => setModalOpen(true)} style={{ marginTop: "12px", padding: "10px 20px", background: "gray", color: "white", border: "none", borderRadius: "6px" }}>
+              Sign Up to Copy/Export
+            </button>
+          )}
         </div>
       </section>
-
-      {/* Footer */}
-      <footer style={{ background: "#f3f3f3", padding: "20px", textAlign: "center", marginTop: "40px", fontSize: "14px" }}>
-        <a href="#">Terms</a> · <a href="#">Privacy</a> · <a href="#">Disclaimer</a><br />
-        © {new Date().getFullYear()} Briefly Legal — This is not legal advice.
-      </footer>
 
       {/* Signup Modal */}
       {modalOpen && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.6)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 2000 }} onClick={() => setModalOpen(false)}>
           <div style={{ background: "white", padding: "30px", borderRadius: "10px", maxWidth: "400px", width: "90%", position: "relative" }} onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ marginBottom: "20px", textAlign: "center", color: "darkred" }}>Join Briefly Legal Free</h3>
-            <form onSubmit={handleSignup} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              <input type="text" placeholder="Your Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
-              <input type="email" placeholder="Your Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-              <button type="submit" disabled={loading} style={{ padding: "10px", background: "darkred", color: "white", border: "none", borderRadius: "6px" }}>
-                {loading ? "Signing up..." : "Sign Up Free"}
-              </button>
-            </form>
+            {!modalSuccess ? (
+              <>
+                <h3 style={{ marginBottom: "20px", textAlign: "center", color: "darkred" }}>Join Briefly Legal Free</h3>
+                <form onSubmit={handleSignup} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  <input type="text" placeholder="Your Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+                  <input type="email" placeholder="Your Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+                  <button type="submit" disabled={loading} style={{ padding: "10px", background: "darkred", color: "white", border: "none", borderRadius: "6px" }}>
+                    {loading ? "Signing up..." : "Sign Up Free"}
+                  </button>
+                </form>
+              </>
+            ) : (
+              <div style={{ textAlign: "center" }}>
+                <h3 style={{ color: "darkred" }}>✅ Signup Successful!</h3>
+                <p>Thanks for joining Briefly Legal. You can now save and export documents.</p>
+                <button onClick={() => setModalOpen(false)} style={{ marginTop: "20px", padding: "10px 20px", background: "darkred", color: "white", border: "none", borderRadius: "6px" }}>
+                  Continue
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
